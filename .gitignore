@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+
+# Xcode - User-specific
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+project.xcworkspace/xcuserdata/
+
+# Xcode - Build artifacts
+build/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcshareddata/
+!*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Xcode - Signing & provisioning (never commit these)
+*.mobileprovision
+*.p12
+*.cer
+*.certSigningRequest
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+.swiftpm/
+
+# CocoaPods (not used here, but future-proofing)
+Pods/
+
+# Carthage (not used here)
+Carthage/Build/
+
+# fastlane (not used here)
+fastlane/report.xml
+fastlane/screenshots/
+fastlane/test_output/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs & temporary files
+*.log
+*.tmp
+*.swp
