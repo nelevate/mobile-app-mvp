@@ -286,12 +286,27 @@ private struct DeviceRow: View {
             // row — because it's only meaningful once we've got a live
             // subscription, which is exactly when this section is visible.
             if let properties = device.characteristicProperties {
-                Text("Props: \(properties)")
-                    .font(.caption2.monospaced())
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
+                            Text("Props: \(properties)")
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+
+                        // Temporary diagnostic (Task 5A.2): shows whether we've seen
+                        // the firmware's "Starting..." handshake, which is what tells
+                        // us the counter is safe to trust. This line will be removed
+                        // when WorkoutSession takes ownership of the "is the counter
+                        // live" question and the row no longer needs to expose it.
+                        if device.hasValidatedCumulativeCount {
+                            Text("Counter validated ✓")
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.green)
+                        } else {
+                            Text("Counter not yet validated…")
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.orange)
+                        }
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 10)

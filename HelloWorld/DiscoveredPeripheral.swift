@@ -122,6 +122,23 @@ final class DiscoveredPeripheral: Identifiable {
     /// so a reconnect starts clean and matches the firmware's own counter,
     /// which also resets on connect.
     var repCount: Int = 0
+    
+    /// Whether we've seen definitive evidence that `repCount` is trustworthy
+    /// as a fresh baseline for this connection.
+    ///
+    /// The firmware contract is that on every connect, the rope's first
+    /// characteristic notification is the literal string "Starting...". When
+    /// we see that, we know: (a) the rope's counter is 0, and (b) any
+    /// subsequent "Reps: N" values are cumulative from this moment.
+    ///
+    /// This flag exists because WorkoutSession (upcoming) will need to know
+    /// when the raw counter is safe to trust. Before it's true, `repCount`
+    /// might reflect a stale value from a previous connection or a race
+    /// between subscribe and the first firmware write. After it's true, the
+    /// counter can be treated as authoritative for the current session.
+    ///
+    /// Reset to false on disconnect so a subsequent reconnect re-validates.
+    var hasValidatedCumulativeCount: Bool = false
 
 
     /// The most recent raw message string received from the rope, kept

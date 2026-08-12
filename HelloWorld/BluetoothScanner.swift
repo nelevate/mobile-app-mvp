@@ -278,6 +278,7 @@ extension BluetoothScanner: CBCentralManagerDelegate {
         // Reset rope-specific state so a subsequent reconnect starts clean.
         // (The firmware also resets its own counter on connect.)
         entry.repCount = 0
+        entry.hasValidatedCumulativeCount = false
         entry.lastMessage = nil
         entry.repCharacteristic = nil
         entry.characteristicProperties = nil
@@ -464,15 +465,39 @@ extension BluetoothScanner: CBPeripheralDelegate {
         // notification exactly as received, which is invaluable when
         // tracking down "why isn't the counter moving?" bugs.
         entry.lastMessage = String(data: data, encoding: .utf8) ?? "<\(data.count) non-utf8 bytes>"
+        // TEMP DIAGNOSTIC (Task 5A.2): log the raw bytes and decoded
+                // string of every notification so we can see exactly what the
+                // firmware is sending. Remove once handshake detection works.
+                let rawString = String(data: data, encoding: .utf8) ?? "<non-utf8>"
+                let hexBytes = data.map { String(format: "%02x", $0) }.joined(separator: " ")
+                print("📡 BLE notify — utf8: \(rawString.debugDescription)  hex: \(hexBytes)")
 
         switch PulseRopeProtocol.parse(data) {
         case .starting:
-            // Known-benign boot handshake. Ignored on purpose; surfacing
-            // it would spam the status bar on every connect.
-            break
+                    // Kept for forward compatibility: if a future firmware build
+                    // does send a "Starting..." handshake, we defensively re-
+                    // baseline the counter. Current firmware (as of Aug 2026)
+                    // does NOT send this — see the .repCount case for the actual
+                    // validation trigger.
+                    entry.repCount = 0
+                    entry.hasValidatedCumulativeCount = true
 
         case .repCount(let count):
-            entry.repCount = count
+                    // Validate the counter on the first successfully parsed rep
+                    // event of this connection. Rationale: the firmware resets
+                    // its counter to 0 on connect, so any count we see here is
+                    // a trustworthy cumulative count for the current session —
+                    // regardless of whether we caught the first swing or the
+                    // user swung a few times before we finished subscribing.
+                    //
+                    // This replaces the original handshake-based validation
+                    // because empirical testing (Task 5A.2) showed the current
+                    // firmware doesn't send a "Starting..." message; the first
+                    // notification is always a rep count.
+                    if !entry.hasValidatedCumulativeCount {
+                        entry.hasValidatedCumulativeCount = true
+                    }
+                    entry.repCount = count
 
         case .unknown(let raw):
             // Genuine surprise: a payload the parser didn't recognize.
