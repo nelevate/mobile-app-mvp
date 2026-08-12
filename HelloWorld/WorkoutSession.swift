@@ -7,117 +7,214 @@ import Observation
 ///
 /// This type is the single source of truth for workout state. Views
 /// render off `state`; `BluetoothScanner` remains unaware of workouts
-/// (it just reports raw cumulative counts). The two are wired together
-/// in a later task, where WorkoutSession observes a chosen peripheral
-/// and advances its state as rep counts arrive.
+/// (it just reports raw cumulative counts). WorkoutSession bridges
+/// the two by observing a chosen peripheral's counter and advancing
+/// its own state as validation and rep notifications arrive.
 ///
-/// The state machine is deliberately small:
+/// State machine:
 ///
 ///   idle
 ///     │  arm(target:peripheral:)
 ///     ▼
 ///   armed(target:)
-///     │  (peripheral validates its counter — Task 5A.4)
+///     │  peripheral.hasValidatedCumulativeCount becomes true
 ///     ▼
 ///   inProgress(current:target:baseline:)
-///     │  (current reaches target — Task 5A.5)
+///     │  current reaches target  (implemented in Task 5A.5)
 ///     ▼
 ///   completed(finalCount:target:)
 ///     │  reset()
 ///     ▼
 ///   idle
 ///
-/// Task 5A.3 builds only the skeleton: the state enum, the class,
-/// stub methods. No observation logic yet — that lands in 5A.4.
+/// Task 5A.4 (this task) implements armed → inProgress and updates
+/// to current within inProgress. The transition to completed is
+/// deliberately deferred to 5A.5, so during this task's tests a
+/// workout will count reps but never terminate — that's expected.
 @Observable
+@MainActor
 final class WorkoutSession {
 
     // MARK: - State
 
-    /// The lifecycle state of a workout attempt. See the type-level
-    /// doc comment for the transition diagram.
     enum State: Equatable {
 
-        /// No workout in progress. The app boots in this state, and
-        /// returns to it after `reset()`.
+        /// No workout in progress.
         case idle
 
-        /// User has committed to a target and selected a rope, but we
-        /// are waiting for the rope's cumulative counter to be
-        /// validated before we start counting. Typically lasts
-        /// milliseconds; exists as a distinct state so the UI can
-        /// show "Waiting for rope…" honestly instead of showing a
-        /// misleading "0 / target" that might jump once real data
-        /// arrives.
+        /// User has committed to a target and rope, but the rope's
+        /// counter is not yet validated. Waiting for the first
+        /// parseable rep notification (see DiscoveredPeripheral's
+        /// hasValidatedCumulativeCount flag).
         case armed(target: Int)
 
         /// Actively counting.
         ///
-        /// - `current`: reps completed toward this workout (not the
-        ///   rope's raw cumulative count).
+        /// - `current`: reps completed toward this workout, computed
+        ///   as `peripheral.repCount - baseline` when notifications
+        ///   arrive.
         /// - `target`: the goal.
         /// - `baseline`: the rope's cumulative count at the moment
-        ///   the workout transitioned into this state. `current` is
-        ///   computed as `repCount - baseline` when rep notifications
-        ///   arrive. Stored on the state (rather than as a separate
-        ///   property on the class) so it is impossible to have a
-        ///   baseline without an in-progress workout, or vice versa.
+        ///   this state was entered. Stored on the state so that a
+        ///   baseline cannot exist without an in-progress workout.
         case inProgress(current: Int, target: Int, baseline: Int)
 
-        /// Target reached. Further rep notifications are ignored
-        /// until `reset()` is called.
-        ///
-        /// - `finalCount`: reps counted toward the workout at the
-        ///   moment it completed. Normally equals `target`, but
-        ///   preserved as a separate field so we don't lose data if
-        ///   a burst of notifications pushes the count past the
-        ///   target in a single update.
+        /// Target reached. Further rep notifications are ignored.
         case completed(finalCount: Int, target: Int)
     }
 
     // MARK: - Observable state
 
-    /// The current lifecycle state. Views observe this to render.
     private(set) var state: State = .idle
+
+    // MARK: - Private
+
+    /// The peripheral being observed. Non-nil while `state` is
+    /// `.armed` or `.inProgress`; nil in `.idle` and `.completed`.
+    /// Held so observation callbacks can read fresh property values
+    /// from the same instance the caller passed to `arm(…)`.
+    private var peripheral: DiscoveredPeripheral?
 
     // MARK: - Lifecycle
 
-    /// No-op initializer. WorkoutSession starts in `.idle` and does
-    /// nothing until `arm(target:peripheral:)` is called.
     init() {}
 
-    // MARK: - Public API (stubs — logic lands in 5A.4 / 5A.5)
+    // MARK: - Public API
 
     /// Begin a workout attempt.
     ///
-    /// Transitions state to `.armed(target:)`. Once the peripheral's
-    /// `hasValidatedCumulativeCount` becomes true, an internal
-    /// observer (added in Task 5A.4) will advance state to
-    /// `.inProgress`, capturing the peripheral's current `repCount`
-    /// as the baseline.
+    /// If the peripheral has already validated its counter (e.g. the
+    /// user swung a few warm-up reps before tapping "Start"), we skip
+    /// `.armed` entirely and go straight to `.inProgress`, using the
+    /// peripheral's current cumulative count as the baseline. This
+    /// keeps the "Waiting for rope…" UI from flashing when there is
+    /// nothing to wait for.
     ///
-    /// Calling this while a workout is already armed, in progress,
-    /// or completed is a programmer error and will be enforced with
-    /// a precondition in a later task. For now it silently no-ops so
-    /// the skeleton compiles cleanly.
+    /// Otherwise we enter `.armed(target:)` and start observing; the
+    /// first change to `hasValidatedCumulativeCount` will advance us
+    /// to `.inProgress`.
     ///
     /// - Parameters:
-    ///   - target: The number of reps the user wants to complete.
-    ///     Must be > 0.
-    ///   - peripheral: The rope to count against. WorkoutSession
-    ///     holds a reference to observe its rep count.
+    ///   - target: Number of reps to complete. Must be > 0.
+    ///   - peripheral: The rope to count against.
     func arm(target: Int, peripheral: DiscoveredPeripheral) {
-        // TODO(5A.4): validate arguments, store peripheral, set up
-        // observation, transition state to .armed(target:).
+        precondition(target > 0, "Workout target must be positive; got \(target)")
+        precondition(state == .idle, "arm() called from non-idle state: \(state)")
+
+        self.peripheral = peripheral
+
+        if peripheral.hasValidatedCumulativeCount {
+            state = .inProgress(
+                current: 0,
+                target: target,
+                baseline: peripheral.repCount
+            )
+            print("🏋️ WorkoutSession → inProgress (rope already validated; baseline: \(peripheral.repCount), target: \(target))")
+        } else {
+            state = .armed(target: target)
+            print("🏋️ WorkoutSession → armed (target: \(target); waiting for counter validation)")
+        }
+
+        observePeripheral()
     }
 
     /// End the current workout and return to `.idle`. Safe to call
-    /// from any state — including `.idle` itself, in which case it
-    /// is a no-op. Used both after a completed workout and to
-    /// abandon an in-progress one.
+    /// from any state. Used both to abandon an in-progress workout
+    /// and to clear a completed one before starting a new attempt.
     func reset() {
-        // TODO(5A.4): tear down observation, clear peripheral
-        // reference, transition state to .idle.
+        peripheral = nil
         state = .idle
+        // Observation naturally stops: any pending onChange will
+        // find `peripheral` nil (or `state` idle) and no-op, and we
+        // will not re-register.
+        print("🏋️ WorkoutSession → idle (reset)")
+    }
+
+    // MARK: - Observation
+
+    /// Register a one-shot observation for the peripheral's counter
+    /// state. See the `withObservationTracking` gotchas discussed in
+    /// the doc comment on `onChange` inside the body.
+    private func observePeripheral() {
+        guard let peripheral else { return }
+
+        withObservationTracking {
+            // Any property read inside this closure becomes tracked.
+            // We assign to `_` to make the intent explicit — we are
+            // reading solely to register interest, not to use the
+            // value here. The real read happens later, in
+            // `handlePeripheralChange`, after the write completes.
+            _ = peripheral.hasValidatedCumulativeCount
+            _ = peripheral.repCount
+        } onChange: { [weak self] in
+                    // Gotchas encoded here:
+                    //
+                    //   1. `onChange` fires ONCE, then tracking is torn down.
+                    //      We must re-call `observePeripheral()` at the end
+                    //      to continue observing.
+                    //
+                    //   2. `onChange` fires on the willSet side — reading a
+                    //      tracked property here would return the OLD value.
+                    //      Hopping into a Task defers the read to after the
+                    //      write has completed.
+                    //
+                    //   3. `onChange`'s closure is @Sendable and nonisolated.
+                    //      `self` is @MainActor-isolated, so we hop to the
+                    //      main actor explicitly.
+                    //
+                    //   4. Under Swift 6, the Task closure needs its OWN
+                    //      capture of `self` rather than reaching into the
+                    //      outer closure's `weak self` var (which would be
+                    //      a concurrent read of a captured var). Hence the
+                    //      `[weak self]` on the Task itself.
+                    Task { @MainActor [weak self] in
+                        self?.handlePeripheralChange()
+                        self?.observePeripheral()
+                    }
+                }
+    }
+
+    /// React to a change on the observed peripheral. Called from the
+    /// `onChange` continuation after the write has landed.
+    private func handlePeripheralChange() {
+        guard let peripheral else { return }
+
+        switch state {
+        case .idle, .completed:
+            // A pending onChange raced with reset() (or with a
+            // completion that will land in 5A.5). Nothing to do.
+            break
+
+        case .armed(let target):
+            // Waiting for the rope to validate. If it just did,
+            // snapshot the current cumulative count as the baseline
+            // and begin counting.
+            if peripheral.hasValidatedCumulativeCount {
+                state = .inProgress(
+                    current: 0,
+                    target: target,
+                    baseline: peripheral.repCount
+                )
+                print("🏋️ WorkoutSession → inProgress (baseline: \(peripheral.repCount), target: \(target))")
+            }
+
+        case .inProgress(_, let target, let baseline):
+            // A rep notification (or, harmlessly, a spurious change
+            // to hasValidatedCumulativeCount). Recompute `current`
+            // from the fresh cumulative count.
+            //
+            // Task 5A.5 will add the current >= target check that
+            // transitions to .completed. Until then, `current` may
+            // grow past `target` and state stays .inProgress. This
+            // is intentional and safe — no UI consumes this state
+            // yet.
+            let current = peripheral.repCount - baseline
+            state = .inProgress(
+                current: current,
+                target: target,
+                baseline: baseline
+            )
+            print("🏋️ WorkoutSession → inProgress update (current: \(current) / \(target))")
+        }
     }
 }
