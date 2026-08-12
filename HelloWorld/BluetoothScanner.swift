@@ -5,6 +5,11 @@
 //  Owns the CBCentralManager and performs BLE scanning.
 //  Publishes state and discovered devices for SwiftUI to display.
 //
+//  As of Task 5A.1, all BLE protocol facts (service UUID, characteristic
+//  UUID, payload parsing) live in PulseRopeProtocol.swift. This file
+//  should no longer contain any hard-coded UUID strings or inline parsing
+//  logic — if it does, that's a bug and it belongs in PulseRopeProtocol.
+//
 
 
 import Foundation
@@ -12,46 +17,23 @@ import CoreBluetooth
 import Observation
 
 
-/// Wraps Core Bluetooth scanning for Milestone 4A.
+/// Wraps Core Bluetooth scanning and connection lifecycle.
 ///
-/// Responsibilities (intentionally limited for this milestone):
+/// Responsibilities:
 ///   * Own the CBCentralManager
 ///   * Report the current Bluetooth state to the UI
 ///   * Start / stop scans
 ///   * Collect discovered peripherals, deduplicated by identifier
+///   * Initiate and tear down connections
+///   * Discover the rope's service and rep-count characteristic
+///   * Subscribe to notifications and forward parsed rep counts onto
+///     the corresponding DiscoveredPeripheral entry
 ///
-/// It also (as of Task 3):
-///   * Initiates connections to specific peripherals
-///   * Tracks each device's connection state via DiscoveredPeripheral
-///
-/// It also (as of Task 4):
-///   * Discovers the rope's service and rep-count characteristic
-///   * Advances the connection state to `.ready` once the characteristic is in hand
-///
-/// It also (as of Task 5):
-///   * Subscribes to notifications on the rep-count characteristic
-///   * Parses incoming ". Reps: N" strings and updates entry.repCount
-///
-/// It also (as of Task 4D):
-///   * Captures the rep characteristic's advertised properties (Read, Notify, …)
-///     so the UI can display them for verification.
-///   * Defers the `.ready` state until iOS confirms notifications are actually
-///     enabled, so "ready" in the UI truly means "we are receiving updates."
-///   * Surfaces unparseable notification payloads via the status bar for
-///     easier diagnosis of firmware-contract drift.
+/// Protocol details (UUIDs, payload format) are NOT defined here — see
+/// PulseRopeProtocol for those. This class is concerned only with the
+/// mechanics of Core Bluetooth, not with what the rope actually says.
 @Observable
 final class BluetoothScanner: NSObject {
-
-
-    // MARK: - Firmware contract
-    //
-    // These UUIDs must match the ArduinoBLE definitions in the rope's firmware:
-    //     BLEService IMUService("19B10000-E8F2-537E-4F6C-D104768A1214");
-    //     BLEStringCharacteristic switchCharacteristic("19B10001-...", BLERead | BLENotify, 20);
-    //
-    // If firmware changes these UUIDs, update both constants here.
-    static let ropeServiceUUID = CBUUID(string: "19B10000-E8F2-537E-4F6C-D104768A1214")
-    static let ropeCharacteristicUUID = CBUUID(string: "19B10001-E8F2-537E-4F6C-D104768A1214")
 
 
     // MARK: - Published state (SwiftUI reads these)
@@ -115,7 +97,6 @@ final class BluetoothScanner: NSObject {
         //
         // AllowDuplicates: false  → iOS collapses repeat advertisements from
         // the same device into a single callback until something changes.
-        // (We still update RSSI when the callback does fire.)
         centralManager.scanForPeripherals(
             withServices: nil,
             options: [
@@ -137,13 +118,6 @@ final class BluetoothScanner: NSObject {
     }
 
     /// Initiate a connection to a specific discovered device.
-    ///
-    /// This is safe to call at any time; it will no-op if the radio isn't
-    /// ready, if we're already connected/connecting to this device, or if
-    /// something else is obviously wrong. All progress is reported by
-    /// mutating `entry.connectionState`, which SwiftUI observes.
-    ///
-    /// - Parameter entry: The discovered-device row the user tapped.
     func connect(to entry: DiscoveredPeripheral) {
         guard bluetoothState == .poweredOn else {
             statusMessage = "Cannot connect: \(Self.description(for: bluetoothState))"
@@ -152,9 +126,6 @@ final class BluetoothScanner: NSObject {
 
 
         // Reject connection attempts that are already in flight or complete.
-        // Without this guard, tapping a row twice would enqueue a duplicate
-        // connect request; iOS tolerates this but it clutters logs and can
-        // trigger surprising delegate callback ordering.
         switch entry.connectionState {
         case .connecting, .connected, .ready:
             return
@@ -163,10 +134,7 @@ final class BluetoothScanner: NSObject {
         }
 
 
-        // Stop scanning while we bring up the connection. iOS technically
-        // allows scanning and connecting at the same time, but scanning
-        // burns extra radio power and can slow the connection handshake
-        // on some devices. We'll turn scanning back on later if needed.
+        // Stop scanning while we bring up the connection.
         if isScanning {
             centralManager.stopScan()
             isScanning = false
@@ -176,28 +144,12 @@ final class BluetoothScanner: NSObject {
         entry.connectionState = .connecting
         statusMessage = "Connecting to \(entry.displayName)…"
 
-
-        // options: nil → accept the default connection behavior. In future
-        // milestones we may pass CBConnectPeripheralOptionNotifyOnDisconnectionKey
-        // to get system notifications when the rope disconnects while our
-        // app is backgrounded, but that's out of scope for Task 3.
         centralManager.connect(entry.peripheral, options: nil)
     }
 
 
     /// Tear down an active or in-progress connection.
-    ///
-    /// Included in Task 3 (even though the plan slates it for Task 4) because
-    /// during development it's very easy to end up with a "stuck" connection
-    /// — e.g. tap-connect during testing, then walk away and iOS keeps the
-    /// link alive. Having an explicit disconnect gives us a clean escape.
-    ///
-    /// - Parameter entry: The device to disconnect.
     func disconnect(from entry: DiscoveredPeripheral) {
-        // cancelPeripheralConnection is safe to call in every state — it
-        // cancels an in-progress connect attempt or closes an established
-        // one. Either way the delegate callback `didDisconnectPeripheral`
-        // fires, and that's where we update our state.
         centralManager.cancelPeripheralConnection(entry.peripheral)
     }
 
@@ -220,14 +172,9 @@ final class BluetoothScanner: NSObject {
 
     /// Human-readable description for a CBCharacteristicProperties value.
     ///
-    /// Used by Task 4D to display the characteristic's advertised capabilities
-    /// in the device row, so a developer can eyeball whether the firmware is
-    /// exposing the features we expect (specifically Read + Notify for the
-    /// rope's rep characteristic).
-    ///
-    /// We enumerate every property CoreBluetooth defines rather than only the
-    /// ones we currently care about, because a diagnostic view that hides
-    /// unexpected capabilities is worse than useless — it actively misleads.
+    /// Used to display the characteristic's advertised capabilities in the
+    /// device row, so a developer can eyeball whether the firmware is
+    /// exposing the features we expect (Read + Notify for the rope).
     static func description(for properties: CBCharacteristicProperties) -> String {
         var parts: [String] = []
         if properties.contains(.broadcast)                  { parts.append("Broadcast") }
@@ -275,18 +222,11 @@ extension BluetoothScanner: CBCentralManagerDelegate {
     }
 
     /// Called by iOS when a connection attempt succeeds.
-    ///
-    /// At this point we have a live BLE link but we have not yet discovered
-    /// services or characteristics — that begins here, in Task 4. We assign
-    /// ourselves as the peripheral's delegate and kick off service discovery.
     func centralManager(
         _ central: CBCentralManager,
         didConnect peripheral: CBPeripheral
     ) {
         guard let entry = discoveredDevices.first(where: { $0.id == peripheral.identifier }) else {
-            // Shouldn't happen in practice — we only ever initiate connects
-            // from entries in `discoveredDevices` — but we log and bail
-            // rather than crash if it does.
             statusMessage = "Connected to an unknown peripheral (ignored)."
             return
         }
@@ -296,25 +236,17 @@ extension BluetoothScanner: CBCentralManagerDelegate {
         statusMessage = "Connected to \(entry.displayName). Discovering services…"
 
         // Assign ourselves as the peripheral's delegate BEFORE calling any
-        // discovery method. If we don't, the discovery callbacks fire on
-        // nil and we silently never hear back. This is one of the most
-        // common Core Bluetooth footguns.
+        // discovery method. Forgetting this is one of the most common
+        // Core Bluetooth footguns — callbacks silently fire on nil.
         peripheral.delegate = self
 
-        // Ask ONLY for the rope's service UUID. We could pass nil to
-        // discover every service the peripheral offers, but filtering:
-        //   * is faster (skips services we'd ignore anyway),
-        //   * uses less radio time,
-        //   * makes intent explicit to future readers of this code.
-        peripheral.discoverServices([Self.ropeServiceUUID])
+        // Ask ONLY for the rope's service UUID. Filtering here is faster
+        // and makes intent explicit to future readers.
+        peripheral.discoverServices([PulseRopeProtocol.serviceUUID])
     }
 
 
-    /// Called by iOS when a connection attempt fails outright (as opposed to
-    /// succeeding and later dropping — that's `didDisconnectPeripheral`).
-    ///
-    /// The `error` parameter is optional; iOS usually populates it with a
-    /// CBError describing the reason (out of range, timeout, etc.).
+    /// Called by iOS when a connection attempt fails outright.
     func centralManager(
         _ central: CBCentralManager,
         didFailToConnect peripheral: CBPeripheral,
@@ -332,9 +264,7 @@ extension BluetoothScanner: CBCentralManagerDelegate {
 
 
     /// Called by iOS when an established connection drops, OR when we call
-    /// `cancelPeripheralConnection` to tear one down deliberately. The two
-    /// cases are distinguished by whether `error` is nil (deliberate) or
-    /// populated (unexpected drop, e.g. rope went out of range).
+    /// `cancelPeripheralConnection` to tear one down deliberately.
     func centralManager(
         _ central: CBCentralManager,
         didDisconnectPeripheral peripheral: CBPeripheral,
@@ -346,11 +276,7 @@ extension BluetoothScanner: CBCentralManagerDelegate {
 
 
         // Reset rope-specific state so a subsequent reconnect starts clean.
-        // (The firmware also resets its own counter on connect, so this
-        // keeps our view consistent with the device's own view.) We also
-        // drop the characteristic reference and its cached properties —
-        // they belong to the now-dead connection and would be invalid to
-        // use, or misleading to display, after reconnect.
+        // (The firmware also resets its own counter on connect.)
         entry.repCount = 0
         entry.lastMessage = nil
         entry.repCharacteristic = nil
@@ -367,49 +293,31 @@ extension BluetoothScanner: CBCentralManagerDelegate {
     }
 
     /// Called every time the scan hears a BLE advertisement.
-    ///
-    /// - Parameters:
-    ///   - peripheral: the device we heard from
-    ///   - advertisementData: the raw ad packet contents (name, service UUIDs, etc.)
-    ///   - RSSI: signal strength in dBm, wrapped as NSNumber
     func centralManager(
         _ central: CBCentralManager,
         didDiscover peripheral: CBPeripheral,
         advertisementData: [String: Any],
         rssi RSSI: NSNumber
     ) {
-        // Prefer the name from the advertisement packet if present, because it
-        // sometimes arrives before peripheral.name is populated. Fall back to
-        // peripheral.name, which may itself be nil for devices that don't
-        // advertise a local name at all — DiscoveredPeripheral.displayName
-        // will substitute a friendly placeholder in that case.
+        // Prefer the name from the advertisement packet if present.
         let advertisedName =
         (advertisementData[CBAdvertisementDataLocalNameKey] as? String)
         ?? peripheral.name
 
         let rssiValue = RSSI.intValue
 
-        // Deduplicate by peripheral identifier: if we've heard this device
-        // before, update the existing entry in place instead of appending.
         if let existingIndex = discoveredDevices.firstIndex(where: { $0.id == peripheral.identifier }) {
             let existing = discoveredDevices[existingIndex]
             existing.rssi = rssiValue
             existing.lastSeen = Date()
 
-            // The name can improve over time (e.g. nil → "Nelevate Fast Rope").
-            // Only overwrite when the incoming advertisement carries a name
-            // and the existing entry is still missing one. We deliberately
-            // do NOT overwrite an already-known name, because some devices
-            // occasionally re-advertise with a shortened or blank name and
-            // we don't want the UI to flicker.
+            // Only overwrite when the incoming ad has a name and the
+            // existing entry is still missing one — see original notes
+            // about flicker prevention.
             if (existing.name?.isEmpty ?? true), let newName = advertisedName, !newName.isEmpty {
                 existing.name = newName
             }
         } else {
-            // New device: create an entry. The initializer reads the name
-            // directly from peripheral.name, but we may have a better name
-            // from the advertisement packet, so we overwrite immediately
-            // after construction if the advertised name is more informative.
             let newEntry = DiscoveredPeripheral(peripheral: peripheral, rssi: rssiValue)
             if let advertisedName, !advertisedName.isEmpty {
                 newEntry.name = advertisedName
@@ -426,10 +334,6 @@ extension BluetoothScanner: CBCentralManagerDelegate {
 extension BluetoothScanner: CBPeripheralDelegate {
 
     /// Called after `discoverServices` completes — success or failure.
-    ///
-    /// On success we drill down one more level and ask for the specific
-    /// characteristic we care about. On failure we mark the device as failed
-    /// so the UI reflects it and the user can retry.
     func peripheral(
         _ peripheral: CBPeripheral,
         didDiscoverServices error: Error?
@@ -444,12 +348,7 @@ extension BluetoothScanner: CBPeripheralDelegate {
             return
         }
 
-        // Find the rope's service among what iOS reports back. Even though we
-        // filtered by UUID in the discover call, the services array can still
-        // be empty if the peripheral doesn't expose the service we asked for —
-        // for example, if we're accidentally talking to a different device with
-        // a coincidentally similar name.
-        guard let ropeService = peripheral.services?.first(where: { $0.uuid == Self.ropeServiceUUID }) else {
+        guard let ropeService = peripheral.services?.first(where: { $0.uuid == PulseRopeProtocol.serviceUUID }) else {
             entry.connectionState = .failed("Rope service not found on this device.")
             statusMessage = "\(entry.displayName) does not expose the expected service."
             return
@@ -457,22 +356,15 @@ extension BluetoothScanner: CBPeripheralDelegate {
 
         statusMessage = "Found rope service on \(entry.displayName). Discovering characteristics…"
 
-        // Same filter-by-UUID reasoning as before: only ask for what we need.
-        peripheral.discoverCharacteristics([Self.ropeCharacteristicUUID], for: ropeService)
+        peripheral.discoverCharacteristics([PulseRopeProtocol.repCharacteristicUUID], for: ropeService)
     }
 
     /// Called after `discoverCharacteristics(_:for:)` completes.
     ///
-    /// As of Task 4D, this method:
-    ///   * Locates the expected characteristic
-    ///   * Captures its properties string for display in the UI
-    ///   * Verifies Notify is supported (fail fast if firmware changes)
-    ///   * Kicks off the subscribe request
-    ///
-    /// Note the state transition: we do NOT flip `entry.connectionState` to
-    /// `.ready` here. That happens only after `didUpdateNotificationStateFor`
-    /// confirms iOS actually enabled notifications, so the UI's "ready" light
-    /// truly means "notifications are live", not "we asked for them."
+    /// Captures the characteristic's properties for display, verifies Notify
+    /// is supported, and requests a subscription. The transition to `.ready`
+    /// happens later, in `didUpdateNotificationStateFor`, only after iOS
+    /// confirms notifications are actually live.
     func peripheral(
         _ peripheral: CBPeripheral,
         didDiscoverCharacteristicsFor service: CBService,
@@ -488,23 +380,17 @@ extension BluetoothScanner: CBPeripheralDelegate {
             return
         }
 
-        guard let repCharacteristic = service.characteristics?.first(where: { $0.uuid == Self.ropeCharacteristicUUID }) else {
+        guard let repCharacteristic = service.characteristics?.first(where: { $0.uuid == PulseRopeProtocol.repCharacteristicUUID }) else {
             entry.connectionState = .failed("Rep characteristic not found on this device.")
             statusMessage = "\(entry.displayName) does not expose the expected characteristic."
             return
         }
 
-        // Record what iOS says this characteristic supports. We do this
-        // BEFORE the Notify sanity check so that even if the check fails,
-        // the UI can still show what the firmware IS advertising — which
-        // is exactly the information a developer needs to diagnose the
-        // mismatch.
+        // Record what iOS says this characteristic supports BEFORE the
+        // Notify sanity check, so a failure still leaves diagnostic
+        // info visible in the UI.
         entry.characteristicProperties = Self.description(for: repCharacteristic.properties)
 
-        // Sanity check: the firmware declares this characteristic as
-        // BLERead | BLENotify. If a future firmware revision drops Notify
-        // support, subscribing below would silently do nothing — so we
-        // check now and surface the problem while it's easy to diagnose.
         guard repCharacteristic.properties.contains(.notify) else {
             entry.connectionState = .failed("Characteristic does not support notifications.")
             statusMessage = "\(entry.displayName): characteristic missing Notify property."
@@ -512,25 +398,13 @@ extension BluetoothScanner: CBPeripheralDelegate {
         }
 
         entry.repCharacteristic = repCharacteristic
-        // Deliberately NOT setting .ready here — see method doc-comment.
         statusMessage = "Found characteristic on \(entry.displayName). Subscribing to rep notifications…"
 
-        // Ask iOS to enable notifications on this characteristic. The
-        // firmware pushes a new value every completed rep (". Reps: N").
-        // The actual "subscribed / not subscribed" confirmation arrives
-        // asynchronously via peripheral(_:didUpdateNotificationStateFor:),
-        // which is where we finally advance the state to .ready.
         peripheral.setNotifyValue(true, for: repCharacteristic)
     }
 
     /// Called after iOS finishes turning notifications on (or off) for a
-    /// characteristic, in response to `setNotifyValue(_:for:)`.
-    ///
-    /// As of Task 4D this is the authoritative "we are live" transition:
-    /// only when iOS confirms `isNotifying == true` do we flip the entry
-    /// into `.ready`. Any prior state ("Connected — subscribing…") stays
-    /// visible until this callback lands, which is typically 50–200 ms
-    /// after characteristic discovery.
+    /// characteristic. This is the authoritative "we are live" transition.
     func peripheral(
         _ peripheral: CBPeripheral,
         didUpdateNotificationStateFor characteristic: CBCharacteristic,
@@ -547,32 +421,25 @@ extension BluetoothScanner: CBPeripheralDelegate {
         }
 
         if characteristic.isNotifying {
-            // Notifications are now genuinely live. Advance the state.
             entry.connectionState = .ready
             statusMessage = "\(entry.displayName) live. Swing the rope to see reps."
         } else {
-            // Notifications were turned OFF. We don't do this ourselves in
-            // Task 5, so if this fires it means iOS unsubscribed us — usually
-            // because the connection dropped. Nothing to do here; the
-            // disconnect handler will run separately.
+            // Notifications turned OFF. We don't do this ourselves, so if
+            // this fires it means iOS unsubscribed us — usually because
+            // the connection dropped. The disconnect handler will run
+            // separately.
             statusMessage = "Notifications stopped for \(entry.displayName)."
         }
     }
 
     /// Called every time the peripheral pushes a new value on a subscribed
-    /// characteristic. For the Nelevate rope, the firmware writes:
+    /// characteristic.
     ///
-    ///   * `"Starting..."` once on boot (we ignore it, but do not warn)
-    ///   * `". Reps: N"` after every completed rep (we parse N)
-    ///
-    /// We update both `entry.repCount` (the parsed number, drives the big
-    /// counter in the UI) and `entry.lastMessage` (the raw string, useful
-    /// for debugging while we're still stabilizing the firmware contract).
-    ///
-    /// As of Task 4D, payloads that are neither the boot message nor a
-    /// parseable "Reps: N" string also produce a visible status-bar
-    /// diagnostic. Silent parse failures were making firmware-contract
-    /// drift too hard to spot.
+    /// As of Task 5A.1, the actual byte-to-meaning translation lives in
+    /// `PulseRopeProtocol.parse(_:)`. This method's only job is to route
+    /// the parsed result to the right side effects: update the entry's
+    /// rep count, update the debug string, or surface a status message
+    /// for unrecognized payloads.
     func peripheral(
         _ peripheral: CBPeripheral,
         didUpdateValueFor characteristic: CBCharacteristic,
@@ -587,54 +454,31 @@ extension BluetoothScanner: CBPeripheralDelegate {
             return
         }
 
-        // Pull the raw bytes and decode as UTF-8. ArduinoBLE writes plain
-        // ASCII, which is a valid UTF-8 subset, so this decode should never
-        // fail in practice — but we handle failure defensively rather than
-        // force-unwrapping.
-        guard let data = characteristic.value,
-              let raw = String(data: data, encoding: .utf8) else {
-            statusMessage = "Received unreadable payload from \(entry.displayName)."
+        guard let data = characteristic.value else {
+            statusMessage = "Received empty payload from \(entry.displayName)."
             return
         }
 
-        // Store the raw string on the entry regardless of whether we can
-        // parse it. That way the debug row in the UI always reflects the
-        // most recent notification, which is invaluable when tracking down
-        // "why isn't the counter moving?" issues.
-        entry.lastMessage = raw
+        // Preserve the raw string on the entry regardless of parse outcome.
+        // That way the debug row in the UI always shows the most recent
+        // notification exactly as received, which is invaluable when
+        // tracking down "why isn't the counter moving?" bugs.
+        entry.lastMessage = String(data: data, encoding: .utf8) ?? "<\(data.count) non-utf8 bytes>"
 
-        // Parse ". Reps: N".
-        //
-        // We deliberately look for the substring "Reps: " and read the
-        // integer immediately after it, rather than pattern-matching the
-        // whole ". Reps: N" shape. That way, if the firmware author ever
-        // tweaks the prefix (drops the leading period, adds a device ID,
-        // switches to "Rep: " singular, etc.), our parser still works so
-        // long as the "Reps: N" fragment is present.
-        if let repsRange = raw.range(of: "Reps: ") {
-            let numberSubstring = raw[repsRange.upperBound...]
-            // trimmingCharacters handles trailing whitespace/newlines that
-            // firmware sometimes appends without us noticing.
-            let trimmed = numberSubstring.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let parsed = Int(trimmed) {
-                entry.repCount = parsed
-                return
-            }
+        switch PulseRopeProtocol.parse(data) {
+        case .starting:
+            // Known-benign boot handshake. Ignored on purpose; surfacing
+            // it would spam the status bar on every connect.
+            break
+
+        case .repCount(let count):
+            entry.repCount = count
+
+        case .unknown(let raw):
+            // Genuine surprise: a payload the parser didn't recognize.
+            // Surface it in the status bar so firmware-contract drift is
+            // visible instead of silent.
+            statusMessage = "Unparseable payload from \(entry.displayName): \"\(raw)\""
         }
-
-        // The known-benign boot message. Ignored intentionally; if we
-        // surfaced this the status bar would spam on every connect.
-        let trimmedRaw = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmedRaw == "Starting..." {
-            return
-        }
-
-        // Anything else is a genuine surprise: a payload we don't recognize
-        // and can't extract a rep count from. Surface it in the status bar
-        // so firmware-contract drift is visible instead of silent. The raw
-        // string is already visible via lastMessage in the row itself, but
-        // most users won't scroll to find it — the status bar is where
-        // they're already looking when the counter doesn't move.
-        statusMessage = "Unparseable payload from \(entry.displayName): \"\(trimmedRaw)\""
     }
 }
