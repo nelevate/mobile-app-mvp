@@ -199,22 +199,30 @@ final class WorkoutSession {
             }
 
         case .inProgress(_, let target, let baseline):
-            // A rep notification (or, harmlessly, a spurious change
-            // to hasValidatedCumulativeCount). Recompute `current`
-            // from the fresh cumulative count.
-            //
-            // Task 5A.5 will add the current >= target check that
-            // transitions to .completed. Until then, `current` may
-            // grow past `target` and state stays .inProgress. This
-            // is intentional and safe — no UI consumes this state
-            // yet.
-            let current = peripheral.repCount - baseline
-            state = .inProgress(
-                current: current,
-                target: target,
-                baseline: baseline
-            )
-            print("🏋️ WorkoutSession → inProgress update (current: \(current) / \(target))")
-        }
+                    // A rep notification (or, harmlessly, a spurious change
+                    // to hasValidatedCumulativeCount). Recompute `current`
+                    // from the fresh cumulative count, then decide whether
+                    // we have reached the target.
+                    let current = peripheral.repCount - baseline
+
+                    if current >= target {
+                        // Completion. We store `current` as `finalCount`
+                        // rather than `target` on purpose: if a burst of
+                        // notifications pushed us past the target in a
+                        // single update, we preserve the actual number of
+                        // reps observed instead of silently rounding down.
+                        // Normal case: current == target and this is a
+                        // no-op distinction.
+                        state = .completed(finalCount: current, target: target)
+                        print("🏋️ WorkoutSession → completed (final: \(current), target: \(target))")
+                    } else {
+                        state = .inProgress(
+                            current: current,
+                            target: target,
+                            baseline: baseline
+                        )
+                        print("🏋️ WorkoutSession → inProgress update (current: \(current) / \(target))")
+                    }
+                }
     }
 }
