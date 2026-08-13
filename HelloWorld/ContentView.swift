@@ -17,6 +17,12 @@ struct ContentView: View {
     // @State is the correct wrapper because BluetoothScanner is @Observable.
     @State private var scanner = BluetoothScanner()
 
+    /// ID of the peripheral whose workout screen is currently pushed.
+    /// Storing the UUID rather than the DiscoveredPeripheral itself avoids
+    /// forcing Hashable onto the model just to satisfy navigation APIs —
+    /// the identifier is already the source of truth for identity.
+    @State private var openWorkoutForID: UUID?
+
 
     var body: some View {
         NavigationStack {
@@ -73,6 +79,20 @@ struct ContentView: View {
             .padding(.vertical)
             .navigationTitle("Nelevate BLE Prototype")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(item: $openWorkoutForID) { id in
+                // Look the entry back up rather than capturing it. If the entry
+                // disappears from the list mid-workout (e.g. a future "clear
+                // stale devices" feature), we fall through to an empty view
+                // rather than crashing on a dangling reference.
+                if let device = scanner.discoveredDevices.first(where: { $0.id == id }) {
+                    WorkoutContainerView(peripheral: device)
+                        // Fresh session per peripheral. NavigationStack already
+                        // gives us a new view instance per push, but pinning the
+                        // identity makes that guarantee explicit and survives any
+                        // future refactor that reuses the container.
+                        .id(id)
+                }
+            }
         }
     }
 
@@ -114,12 +134,17 @@ struct ContentView: View {
                 List(scanner.discoveredDevices) { device in
                     DeviceRow(device: device) {
                         // Tap behavior depends on current connection state.
+                        //
+                        // As of Task 5A.8, tapping a .ready row opens the
+                        // workout view instead of disconnecting. Ending a
+                        // session is a workout-view concern; the scanner
+                        // screen is only responsible for getting us there.
                         switch device.connectionState {
                         case .disconnected, .failed:
                             scanner.connect(to: device)
-                        case .connected, .ready:
-                            scanner.disconnect(from: device)
-                        case .connecting:
+                        case .ready:
+                            openWorkoutForID = device.id
+                        case .connecting, .connected:
                             break
                         }
                     }
@@ -170,8 +195,8 @@ private struct DeviceRow: View {
 
 
     /// Called when the user taps anywhere on the row. The parent decides
-    /// what tapping actually means (connect, disconnect, etc.) — this view
-    /// stays presentational.
+    /// what tapping actually means (connect, open workout, etc.) — this
+    /// view stays presentational.
     let onTap: () -> Void
 
 
@@ -343,7 +368,7 @@ private struct DeviceRow: View {
         case .disconnected:            return "Not connected — tap to connect"
         case .connecting:              return "Connecting…"
         case .connected:               return "Connected — preparing subscription…"
-        case .ready:                   return "Ready — tap to disconnect"
+        case .ready:                   return "Ready — tap to start workout"
         case .failed(let reason):      return "Failed: \(reason)"
         }
     }
