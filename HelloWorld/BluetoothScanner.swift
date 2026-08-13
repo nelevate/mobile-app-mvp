@@ -222,6 +222,15 @@ extension BluetoothScanner: CBCentralManagerDelegate {
     }
 
     /// Called by iOS when a connection attempt succeeds.
+    ///
+    /// This is the "clean slate" point for the entry's rope-specific
+    /// runtime data: the firmware zeroes its own counter on connect, and
+    /// nothing downstream (WorkoutSession, etc.) is yet observing this
+    /// peripheral for a workout — the entry isn't `.ready` until we
+    /// confirm notifications are live, several callbacks from now. That
+    /// makes this the safe place to wipe stale telemetry, rather than
+    /// doing it on disconnect where an active WorkoutSession would see
+    /// the wipe race the connection-state flip.
     func centralManager(
         _ central: CBCentralManager,
         didConnect peripheral: CBPeripheral
@@ -230,6 +239,14 @@ extension BluetoothScanner: CBCentralManagerDelegate {
             statusMessage = "Connected to an unknown peripheral (ignored)."
             return
         }
+
+
+        // Clean slate for a fresh connection. Safe here because the entry
+        // is not yet `.ready`, so no observer can be treating this
+        // peripheral's state as authoritative for a workout.
+        entry.repCount = 0
+        entry.hasValidatedCumulativeCount = false
+        entry.lastMessage = nil
 
 
         entry.connectionState = .connected
@@ -265,6 +282,27 @@ extension BluetoothScanner: CBCentralManagerDelegate {
 
     /// Called by iOS when an established connection drops, OR when we call
     /// `cancelPeripheralConnection` to tear one down deliberately.
+    ///
+    /// Ordering matters here. An active WorkoutSession is observing
+    /// `connectionState`, `hasValidatedCumulativeCount`, and `repCount`
+    /// on this entry via `withObservationTracking`. The observation is
+    /// one-shot: whichever property we mutate FIRST is the one whose
+    /// change wakes the observer, and by the time the observer's Task
+    /// runs, all mutations in this method have completed.
+    ///
+    /// We therefore flip `connectionState` FIRST. That way, when
+    /// `WorkoutSession.handlePeripheralChange` reads the peripheral, it
+    /// sees a coherent "the connection is gone" snapshot instead of a
+    /// half-torn-down state where, say, `repCount = 0` has landed but
+    /// `connectionState` is still `.ready`.
+    ///
+    /// We deliberately do NOT reset `repCount` here. The firmware resets
+    /// its own counter on the next connect, and `didConnect` performs
+    /// the corresponding clean-slate reset on our side. Leaving the
+    /// last-known count in place during teardown means any consumer
+    /// still holding a reference to the entry sees a sensible value
+    /// rather than a bogus 0 that would produce a negative "current"
+    /// when subtracted from a baseline.
     func centralManager(
         _ central: CBCentralManager,
         didDisconnectPeripheral peripheral: CBPeripheral,
@@ -275,15 +313,10 @@ extension BluetoothScanner: CBCentralManagerDelegate {
         }
 
 
-        // Reset rope-specific state so a subsequent reconnect starts clean.
-        // (The firmware also resets its own counter on connect.)
-        entry.repCount = 0
-        entry.hasValidatedCumulativeCount = false
-        entry.lastMessage = nil
-        entry.repCharacteristic = nil
-        entry.characteristicProperties = nil
-
-
+        // 1. Flip lifecycle FIRST. This is the mutation observers care
+        //    about, and firing it first means the observer's snapshot
+        //    of the entry is internally consistent: "disconnected, and
+        //    everything else is still whatever it last was."
         if let error {
             entry.connectionState = .failed(error.localizedDescription)
             statusMessage = "Lost connection to \(entry.displayName): \(error.localizedDescription)"
@@ -291,6 +324,17 @@ extension BluetoothScanner: CBCentralManagerDelegate {
             entry.connectionState = .disconnected
             statusMessage = "Disconnected from \(entry.displayName)."
         }
+
+
+        // 2. Now tear down the transport-level bits. Ordering among
+        //    these doesn't matter — the observer has already been
+        //    triggered by step 1, and these fields aren't part of any
+        //    subtraction or comparison downstream.
+        //    Note: NOT touching entry.repCount. See method doc above.
+        entry.hasValidatedCumulativeCount = false
+        entry.lastMessage = nil
+        entry.repCharacteristic = nil
+        entry.characteristicProperties = nil
     }
 
     /// Called every time the scan hears a BLE advertisement.

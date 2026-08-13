@@ -1,35 +1,17 @@
 import SwiftUI
 
 /// Renders the current phase of a workout and exposes user actions
-/// as callbacks. Deliberately does not know about DiscoveredPeripheral
-/// or BluetoothScanner — the parent view is responsible for choosing
-/// which rope a workout runs against and for translating our callbacks
-/// into calls on a WorkoutSession.
-///
-/// This separation keeps WorkoutView fully renderable in previews with
-/// sample state values, no Bluetooth stack required.
+/// as callbacks.
 struct WorkoutView: View {
 
     // MARK: - Inputs
 
-    /// The current workout state, typically `session.state` from a
-    /// `WorkoutSession` owned by the parent.
     let state: WorkoutSession.State
-
-    /// Called when the user taps "Start Workout" from `.idle`. The
-    /// Int is the target rep count the user selected on the stepper.
     let onStart: (Int) -> Void
-
-    /// Called when the user taps Cancel (from `.armed` / `.inProgress`)
-    /// or "New Workout" (from `.completed`). Both map to `reset()` on
-    /// the session; the parent doesn't need to distinguish.
     let onReset: () -> Void
 
     // MARK: - Local state
 
-    /// Target rep count the user is currently dialing on the stepper.
-    /// Persists across state changes so if the user cancels mid-workout
-    /// and starts again, the stepper is where they left it.
     @State private var targetInput: Int = 20
 
     // MARK: - Body
@@ -43,8 +25,8 @@ struct WorkoutView: View {
                 armedView(target: target)
             case .inProgress(let current, let target, _):
                 inProgressView(current: current, target: target)
-            case .completed(let finalCount, let target):
-                completedView(finalCount: finalCount, target: target)
+            case .summary(let summary):
+                summaryView(summary: summary)
             }
         }
         .padding()
@@ -54,10 +36,6 @@ struct WorkoutView: View {
 
     // MARK: - Idle
 
-    /// Stepper + Start button. The stepper's bounds (5...500 in steps
-    /// of 5) are chosen loosely: 5 as a sensible minimum warm-up, 500
-    /// as a soft ceiling that no reasonable single workout will hit
-    /// but which leaves room for endurance sessions.
     private var idleView: some View {
         VStack(spacing: 20) {
             Text("Set a target")
@@ -111,11 +89,34 @@ struct WorkoutView: View {
     // MARK: - In progress
 
     private func inProgressView(current: Int, target: Int) -> some View {
-        // Clamp for the progress bar so we can't render >100% during
-        // the brief window before .completed lands. The numeric
-        // readout below intentionally shows the raw `current` so a
-        // burst-overshoot is visible if it happens.
-        let fraction = min(1.0, Double(current) / Double(target))
+        // Defensive clamping for the progress fraction.
+        //
+        // WorkoutSession already clamps `current` to be non-negative and
+        // transitions to .summary(.completed) when `current >= target`,
+        // so in normal operation `fraction` will land in [0, 1] without
+        // any help from us. But a value view like ProgressView should
+        // not trust its inputs to be pre-clamped — SwiftUI logs a
+        // runtime warning ("ProgressView initialized with an
+        // out-of-bounds progress value…") if the value ever falls
+        // outside the range, and that warning has bitten us during
+        // disconnect races in earlier tasks.
+        //
+        // Two-sided clamp:
+        //   * `max(0, …)` guards against a negative `current` sneaking
+        //     through (would produce a negative fraction).
+        //   * `min(1, …)` guards against the one-frame window where
+        //     `current == target` has been observed but the state
+        //     machine hasn't yet flipped to .summary — the ratio would
+        //     be exactly 1.0 there, which is fine, but any overshoot
+        //     from a burst of notifications would push it above 1.0.
+        //
+        // Also guards against target == 0 (which would divide by zero)
+        // even though WorkoutSession's `arm()` precondition forbids it
+        // — cheap insurance against a future caller path we haven't
+        // written yet.
+        let safeTarget = max(1, target)
+        let rawFraction = Double(current) / Double(safeTarget)
+        let fraction = min(1.0, max(0.0, rawFraction))
 
         return VStack(spacing: 20) {
             Text("\(current) / \(target)")
@@ -133,30 +134,25 @@ struct WorkoutView: View {
         }
     }
 
-    // MARK: - Completed
+    // MARK: - Summary
 
-    private func completedView(finalCount: Int, target: Int) -> some View {
+    private func summaryView(summary: WorkoutSummary) -> some View {
         VStack(spacing: 20) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(.green)
+            summaryIcon(for: summary.resultType)
 
-            Text("Done!")
+            Text(summaryHeadline(for: summary.resultType))
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-            // Show finalCount prominently. If it exceeds target,
-            // surface that fact — the user did bonus reps and
-            // deserves to see them.
             VStack(spacing: 4) {
-                Text("\(finalCount) reps")
+                Text("\(summary.finalCount) reps")
                     .font(.title2.monospacedDigit())
-                if finalCount > target {
-                    Text("(+\(finalCount - target) over target of \(target))")
+                if summary.finalCount > summary.target {
+                    Text("(+\(summary.finalCount - summary.target) over target of \(summary.target))")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("Target: \(target)")
+                    Text("Target: \(summary.target)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -177,19 +173,37 @@ struct WorkoutView: View {
         }
     }
 
+    @ViewBuilder
+    private func summaryIcon(for resultType: WorkoutSummary.ResultType) -> some View {
+        switch resultType {
+        case .completed:
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 80))
+                .foregroundStyle(.green)
+        case .disconnected:
+            Image(systemName: "wifi.exclamationmark")
+                .font(.system(size: 80))
+                .foregroundStyle(.orange)
+        }
+    }
+
+    private func summaryHeadline(for resultType: WorkoutSummary.ResultType) -> String {
+        switch resultType {
+        case .completed:
+            return "Done!"
+        case .disconnected:
+            return "Rope disconnected"
+        }
+    }
+
     // MARK: - Helpers
 
-    /// A stable identifier for the current state case, used to trigger
-    /// the top-level `.animation(...)` when transitioning between
-    /// cases. We deliberately avoid animating on every `current`
-    /// update inside `.inProgress` — that's handled locally by
-    /// `.contentTransition(.numericText)` on the count.
     private var stateKey: Int {
         switch state {
         case .idle:       return 0
         case .armed:      return 1
         case .inProgress: return 2
-        case .completed:  return 3
+        case .summary:    return 3
         }
     }
 }
@@ -220,17 +234,41 @@ struct WorkoutView: View {
     )
 }
 
-#Preview("Completed (exact)") {
+#Preview("Summary (exact)") {
     WorkoutView(
-        state: .completed(finalCount: 50, target: 50),
+        state: .summary(
+            WorkoutSummary(resultType: .completed, finalCount: 50, target: 50)
+        ),
         onStart: { _ in },
         onReset: {}
     )
 }
 
-#Preview("Completed (overshoot)") {
+#Preview("Summary (overshoot)") {
     WorkoutView(
-        state: .completed(finalCount: 53, target: 50),
+        state: .summary(
+            WorkoutSummary(resultType: .completed, finalCount: 53, target: 50)
+        ),
+        onStart: { _ in },
+        onReset: {}
+    )
+}
+
+#Preview("Summary (disconnected mid-workout)") {
+    WorkoutView(
+        state: .summary(
+            WorkoutSummary(resultType: .disconnected, finalCount: 17, target: 50)
+        ),
+        onStart: { _ in },
+        onReset: {}
+    )
+}
+
+#Preview("Summary (disconnected before start)") {
+    WorkoutView(
+        state: .summary(
+            WorkoutSummary(resultType: .disconnected, finalCount: 0, target: 50)
+        ),
         onStart: { _ in },
         onReset: {}
     )
