@@ -6,11 +6,66 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C3DBDE1930896A2F00D0EAB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+		C3DBDE2E3089757200D0EAB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+		C3DBDE4030897B1C00D0EAB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+		C3DBDE5030897E9E00D0EAB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		C3DBDE1530896A2F00D0EAB8 /* PulseRopeProtocolTests.swift.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulseRopeProtocolTests.swift.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3DBDE2A3089757200D0EAB8 /* TaiDocScaleProtocol.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaiDocScaleProtocol.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3DBDE3C30897B1C00D0EAB8 /* TaiDocOximeterProtocol.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaiDocOximeterProtocol.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3DBDE4C30897E9E00D0EAB8 /* TaiDocBpProtocol.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaiDocBpProtocol.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEEA0AA030275EE000902D49 /* HelloWorld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloWorld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C3DBDE1630896A2F00D0EAB8 /* PulseRopeProtocolTests.swift */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PulseRopeProtocolTests.swift;
+			sourceTree = "<group>";
+		};
+		C3DBDE2B3089757200D0EAB8 /* TaiDocScaleProtocol */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TaiDocScaleProtocol;
+			sourceTree = "<group>";
+		};
+		C3DBDE3D30897B1C00D0EAB8 /* TaiDocOximeterProtocol */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TaiDocOximeterProtocol;
+			sourceTree = "<group>";
+		};
+		C3DBDE4D30897E9E00D0EAB8 /* TaiDocBpProtocol */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TaiDocBpProtocol;
+			sourceTree = "<group>";
+		};
 		CEEA0AA230275EE000902D49 /* HelloWorld */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = HelloWorld;
@@ -19,6 +74,34 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C3DBDE1230896A2F00D0EAB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE273089757200D0EAB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE3930897B1C00D0EAB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE4930897E9E00D0EAB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9D30275EE000902D49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,6 +116,10 @@
 			isa = PBXGroup;
 			children = (
 				CEEA0AA230275EE000902D49 /* HelloWorld */,
+				C3DBDE1630896A2F00D0EAB8 /* PulseRopeProtocolTests.swift */,
+				C3DBDE2B3089757200D0EAB8 /* TaiDocScaleProtocol */,
+				C3DBDE3D30897B1C00D0EAB8 /* TaiDocOximeterProtocol */,
+				C3DBDE4D30897E9E00D0EAB8 /* TaiDocBpProtocol */,
 				CEEA0AA130275EE000902D49 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +128,10 @@
 			isa = PBXGroup;
 			children = (
 				CEEA0AA030275EE000902D49 /* HelloWorld.app */,
+				C3DBDE1530896A2F00D0EAB8 /* PulseRopeProtocolTests.swift.xctest */,
+				C3DBDE2A3089757200D0EAB8 /* TaiDocScaleProtocol.xctest */,
+				C3DBDE3C30897B1C00D0EAB8 /* TaiDocOximeterProtocol.xctest */,
+				C3DBDE4C30897E9E00D0EAB8 /* TaiDocBpProtocol.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +139,98 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C3DBDE1430896A2F00D0EAB8 /* PulseRopeProtocolTests.swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3DBDE1D30896A2F00D0EAB8 /* Build configuration list for PBXNativeTarget "PulseRopeProtocolTests.swift" */;
+			buildPhases = (
+				C3DBDE1130896A2F00D0EAB8 /* Sources */,
+				C3DBDE1230896A2F00D0EAB8 /* Frameworks */,
+				C3DBDE1330896A2F00D0EAB8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3DBDE1A30896A2F00D0EAB8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3DBDE1630896A2F00D0EAB8 /* PulseRopeProtocolTests.swift */,
+			);
+			name = PulseRopeProtocolTests.swift;
+			packageProductDependencies = (
+			);
+			productName = PulseRopeProtocolTests.swift;
+			productReference = C3DBDE1530896A2F00D0EAB8 /* PulseRopeProtocolTests.swift.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C3DBDE293089757200D0EAB8 /* TaiDocScaleProtocol */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3DBDE303089757200D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocScaleProtocol" */;
+			buildPhases = (
+				C3DBDE263089757200D0EAB8 /* Sources */,
+				C3DBDE273089757200D0EAB8 /* Frameworks */,
+				C3DBDE283089757200D0EAB8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3DBDE2F3089757200D0EAB8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3DBDE2B3089757200D0EAB8 /* TaiDocScaleProtocol */,
+			);
+			name = TaiDocScaleProtocol;
+			packageProductDependencies = (
+			);
+			productName = TaiDocScaleProtocol;
+			productReference = C3DBDE2A3089757200D0EAB8 /* TaiDocScaleProtocol.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C3DBDE3B30897B1C00D0EAB8 /* TaiDocOximeterProtocol */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3DBDE4230897B1C00D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocOximeterProtocol" */;
+			buildPhases = (
+				C3DBDE3830897B1C00D0EAB8 /* Sources */,
+				C3DBDE3930897B1C00D0EAB8 /* Frameworks */,
+				C3DBDE3A30897B1C00D0EAB8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3DBDE4130897B1C00D0EAB8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3DBDE3D30897B1C00D0EAB8 /* TaiDocOximeterProtocol */,
+			);
+			name = TaiDocOximeterProtocol;
+			packageProductDependencies = (
+			);
+			productName = TaiDocOximeterProtocol;
+			productReference = C3DBDE3C30897B1C00D0EAB8 /* TaiDocOximeterProtocol.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C3DBDE4B30897E9E00D0EAB8 /* TaiDocBpProtocol */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3DBDE5230897E9E00D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocBpProtocol" */;
+			buildPhases = (
+				C3DBDE4830897E9E00D0EAB8 /* Sources */,
+				C3DBDE4930897E9E00D0EAB8 /* Frameworks */,
+				C3DBDE4A30897E9E00D0EAB8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3DBDE5130897E9E00D0EAB8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3DBDE4D30897E9E00D0EAB8 /* TaiDocBpProtocol */,
+			);
+			name = TaiDocBpProtocol;
+			packageProductDependencies = (
+			);
+			productName = TaiDocBpProtocol;
+			productReference = C3DBDE4C30897E9E00D0EAB8 /* TaiDocBpProtocol.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		CEEA0A9F30275EE000902D49 /* HelloWorld */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CEEA0AAB30275EE200902D49 /* Build configuration list for PBXNativeTarget "HelloWorld" */;
@@ -77,9 +260,25 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2660;
+				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					C3DBDE1430896A2F00D0EAB8 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
+					C3DBDE293089757200D0EAB8 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
+					C3DBDE3B30897B1C00D0EAB8 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
+					C3DBDE4B30897E9E00D0EAB8 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
 					CEEA0A9F30275EE000902D49 = {
 						CreatedOnToolsVersion = 26.6;
 					};
@@ -100,11 +299,43 @@
 			projectRoot = "";
 			targets = (
 				CEEA0A9F30275EE000902D49 /* HelloWorld */,
+				C3DBDE1430896A2F00D0EAB8 /* PulseRopeProtocolTests.swift */,
+				C3DBDE293089757200D0EAB8 /* TaiDocScaleProtocol */,
+				C3DBDE3B30897B1C00D0EAB8 /* TaiDocOximeterProtocol */,
+				C3DBDE4B30897E9E00D0EAB8 /* TaiDocBpProtocol */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C3DBDE1330896A2F00D0EAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE283089757200D0EAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE3A30897B1C00D0EAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE4A30897E9E00D0EAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9E30275EE000902D49 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +346,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C3DBDE1130896A2F00D0EAB8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE263089757200D0EAB8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE3830897B1C00D0EAB8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DBDE4830897E9E00D0EAB8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9C30275EE000902D49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +383,206 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C3DBDE1A30896A2F00D0EAB8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C3DBDE1930896A2F00D0EAB8 /* PBXContainerItemProxy */;
+		};
+		C3DBDE2F3089757200D0EAB8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C3DBDE2E3089757200D0EAB8 /* PBXContainerItemProxy */;
+		};
+		C3DBDE4130897B1C00D0EAB8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C3DBDE4030897B1C00D0EAB8 /* PBXContainerItemProxy */;
+		};
+		C3DBDE5130897E9E00D0EAB8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C3DBDE5030897E9E00D0EAB8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C3DBDE1B30896A2F00D0EAB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "nelevate.PulseRopeProtocolTests-swift";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C3DBDE1C30896A2F00D0EAB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "nelevate.PulseRopeProtocolTests-swift";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
+		C3DBDE313089757200D0EAB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocScaleProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C3DBDE323089757200D0EAB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocScaleProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
+		C3DBDE4330897B1C00D0EAB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocOximeterProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C3DBDE4430897B1C00D0EAB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocOximeterProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
+		C3DBDE5330897E9E00D0EAB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocBpProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C3DBDE5430897E9E00D0EAB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.TaiDocBpProtocol;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
 		CEEA0AA930275EE200902D49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -253,7 +711,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72QWWNRGG7;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Nelevate uses Bluetooth to find and connect to your Pulse Rope and compatible fitness sensors.";
@@ -262,12 +720,13 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nelevate.HelloWorld;
+				PRODUCT_BUNDLE_IDENTIFIER = com.localdev.helloworld;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -286,7 +745,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72QWWNRGG7;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Nelevate uses Bluetooth to find and connect to your Pulse Rope and compatible fitness sensors.";
@@ -295,12 +754,13 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nelevate.HelloWorld;
+				PRODUCT_BUNDLE_IDENTIFIER = com.localdev.helloworld;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -315,6 +775,42 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C3DBDE1D30896A2F00D0EAB8 /* Build configuration list for PBXNativeTarget "PulseRopeProtocolTests.swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3DBDE1B30896A2F00D0EAB8 /* Debug */,
+				C3DBDE1C30896A2F00D0EAB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3DBDE303089757200D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocScaleProtocol" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3DBDE313089757200D0EAB8 /* Debug */,
+				C3DBDE323089757200D0EAB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3DBDE4230897B1C00D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocOximeterProtocol" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3DBDE4330897B1C00D0EAB8 /* Debug */,
+				C3DBDE4430897B1C00D0EAB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3DBDE5230897E9E00D0EAB8 /* Build configuration list for PBXNativeTarget "TaiDocBpProtocol" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3DBDE5330897E9E00D0EAB8 /* Debug */,
+				C3DBDE5430897E9E00D0EAB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CEEA0A9B30275EE000902D49 /* Build configuration list for PBXProject "HelloWorld" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
