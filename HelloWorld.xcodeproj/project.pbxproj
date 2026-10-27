@@ -6,11 +6,40 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C33075CC308EBE7D009F97C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+		C3C204AD308EC8AA00B83D97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEEA0A9830275EE000902D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEA0A9F30275EE000902D49;
+			remoteInfo = HelloWorld;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		C33075C8308EBE7D009F97C7 /* BluetoothScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BluetoothScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3C204A9308EC8AA00B83D97 /* BluetoothManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BluetoothManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEEA0AA030275EE000902D49 /* HelloWorld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloWorld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C33075C9308EBE7D009F97C7 /* BluetoothScannerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BluetoothScannerTests;
+			sourceTree = "<group>";
+		};
+		C3C204AA308EC8AA00B83D97 /* BluetoothManagerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BluetoothManagerTests;
+			sourceTree = "<group>";
+		};
 		CEEA0AA230275EE000902D49 /* HelloWorld */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = HelloWorld;
@@ -19,6 +48,20 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C33075C5308EBE7D009F97C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3C204A6308EC8AA00B83D97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9D30275EE000902D49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -29,10 +72,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C33075C3308EBDF8009F97C7 /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
 		CEEA0A9730275EE000902D49 = {
 			isa = PBXGroup;
 			children = (
+				C33075C3308EBDF8009F97C7 /* Bluetooth */,
 				CEEA0AA230275EE000902D49 /* HelloWorld */,
+				C33075C9308EBE7D009F97C7 /* BluetoothScannerTests */,
+				C3C204AA308EC8AA00B83D97 /* BluetoothManagerTests */,
 				CEEA0AA130275EE000902D49 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				CEEA0AA030275EE000902D49 /* HelloWorld.app */,
+				C33075C8308EBE7D009F97C7 /* BluetoothScannerTests.xctest */,
+				C3C204A9308EC8AA00B83D97 /* BluetoothManagerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +103,52 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C33075C7308EBE7D009F97C7 /* BluetoothScannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C33075CE308EBE7D009F97C7 /* Build configuration list for PBXNativeTarget "BluetoothScannerTests" */;
+			buildPhases = (
+				C33075C4308EBE7D009F97C7 /* Sources */,
+				C33075C5308EBE7D009F97C7 /* Frameworks */,
+				C33075C6308EBE7D009F97C7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C33075CD308EBE7D009F97C7 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C33075C9308EBE7D009F97C7 /* BluetoothScannerTests */,
+			);
+			name = BluetoothScannerTests;
+			packageProductDependencies = (
+			);
+			productName = BluetoothScannerTests;
+			productReference = C33075C8308EBE7D009F97C7 /* BluetoothScannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C3C204A8308EC8AA00B83D97 /* BluetoothManagerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3C204AF308EC8AA00B83D97 /* Build configuration list for PBXNativeTarget "BluetoothManagerTests" */;
+			buildPhases = (
+				C3C204A5308EC8AA00B83D97 /* Sources */,
+				C3C204A6308EC8AA00B83D97 /* Frameworks */,
+				C3C204A7308EC8AA00B83D97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C3C204AE308EC8AA00B83D97 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C3C204AA308EC8AA00B83D97 /* BluetoothManagerTests */,
+			);
+			name = BluetoothManagerTests;
+			packageProductDependencies = (
+			);
+			productName = BluetoothManagerTests;
+			productReference = C3C204A9308EC8AA00B83D97 /* BluetoothManagerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		CEEA0A9F30275EE000902D49 /* HelloWorld */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CEEA0AAB30275EE200902D49 /* Build configuration list for PBXNativeTarget "HelloWorld" */;
@@ -77,9 +178,17 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2660;
+				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					C33075C7308EBE7D009F97C7 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
+					C3C204A8308EC8AA00B83D97 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = CEEA0A9F30275EE000902D49;
+					};
 					CEEA0A9F30275EE000902D49 = {
 						CreatedOnToolsVersion = 26.6;
 					};
@@ -100,11 +209,27 @@
 			projectRoot = "";
 			targets = (
 				CEEA0A9F30275EE000902D49 /* HelloWorld */,
+				C33075C7308EBE7D009F97C7 /* BluetoothScannerTests */,
+				C3C204A8308EC8AA00B83D97 /* BluetoothManagerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C33075C6308EBE7D009F97C7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3C204A7308EC8AA00B83D97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9E30275EE000902D49 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +240,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C33075C4308EBE7D009F97C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3C204A5308EC8AA00B83D97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEEA0A9C30275EE000902D49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +263,108 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C33075CD308EBE7D009F97C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C33075CC308EBE7D009F97C7 /* PBXContainerItemProxy */;
+		};
+		C3C204AE308EC8AA00B83D97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEA0A9F30275EE000902D49 /* HelloWorld */;
+			targetProxy = C3C204AD308EC8AA00B83D97 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C33075CF308EBE7D009F97C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.BluetoothScannerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C33075D0308EBE7D009F97C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.BluetoothScannerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
+		C3C204B0308EC8AA00B83D97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.BluetoothManagerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Debug;
+		};
+		C3C204B1308EC8AA00B83D97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nelevate.BluetoothManagerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HelloWorld.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HelloWorld";
+			};
+			name = Release;
+		};
 		CEEA0AA930275EE200902D49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -253,7 +493,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72QWWNRGG7;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Nelevate uses Bluetooth to find and connect to your Pulse Rope and compatible fitness sensors.";
@@ -262,6 +502,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -286,7 +527,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 72QWWNRGG7;
+				DEVELOPMENT_TEAM = C9S6FUYQ8Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Nelevate uses Bluetooth to find and connect to your Pulse Rope and compatible fitness sensors.";
@@ -295,6 +536,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -315,6 +557,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C33075CE308EBE7D009F97C7 /* Build configuration list for PBXNativeTarget "BluetoothScannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C33075CF308EBE7D009F97C7 /* Debug */,
+				C33075D0308EBE7D009F97C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3C204AF308EC8AA00B83D97 /* Build configuration list for PBXNativeTarget "BluetoothManagerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3C204B0308EC8AA00B83D97 /* Debug */,
+				C3C204B1308EC8AA00B83D97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CEEA0A9B30275EE000902D49 /* Build configuration list for PBXProject "HelloWorld" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
