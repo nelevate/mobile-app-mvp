@@ -10,7 +10,7 @@ import Foundation
 import Observation
 
 @Observable
-final class DiscoveredPeripheral: Identifiable {
+final class DiscoveredPeripheral: Identifiable, Hashable {
     enum ConnectionState: Equatable {
         case disconnected
         case connecting
@@ -60,6 +60,16 @@ final class DiscoveredPeripheral: Identifiable {
         self.peripheral = peripheral
         self.name = peripheral.name
         self.rssi = rssi
+    }
+
+    // MARK: - Hashable
+
+    static func == (lhs: DiscoveredPeripheral, rhs: DiscoveredPeripheral) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
